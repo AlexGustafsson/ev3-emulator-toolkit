@@ -34,6 +34,15 @@ A dockerized toolchain for building the EV3's firmware is available under `tools
 docker build -t ev3-emulator-toolkit/firmware -f ./tools/firmware/Dockerfile ./tools/firmware/
 ```
 
+### Firmware extraction
+
+1. Download a firmware from the official site: https://education.lego.com/en-us/support/mindstorms-ev3/firmware-update (there's a download button at the bottom of the site)
+2. Use `binwalk` to extract files
+  * Docker: `docker run -v "$(pwd):/samples" cincan/binwalk --extract --matryoshka --directory /samples /samples/LME-EV3_Firmware_1.10E.bin`
+  * Native: `binwalk --extract --matryoshka LME-EV3_Firmware_1.10E.bin`
+
+Described in more detail in `documentation/firmware-extraction.md`.
+
 ### UF2 toolchain
 
 MakeCode utilizes the [UF2 format](https://github.com/microsoft/uf2) to pack its projects. The Python 3 package in `tools/uf2` can be used to interact with the archives to, for example, extract the project binary file.
