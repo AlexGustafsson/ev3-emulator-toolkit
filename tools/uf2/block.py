@@ -1,3 +1,4 @@
+import struct
 from typing import Tuple
 from struct import Struct
 
@@ -7,9 +8,9 @@ FAMILY_ID_PRESENT = 0x00002000
 MD5_CHECKSUM_PRESENT = 0x00004000
 EXTENSION_TAGS_PRESENT = 0x00008000
 
-MAGIC_NUMBER_0 = 0x0A324655
-MAGIC_NUMBER_1 = 0x9E5D5157
-MAGIC_NUMBER_END = 0x0AB16F30
+MAGIC_NUMBER_0 = struct.pack('<L', 0x0A324655)
+MAGIC_NUMBER_1 = struct.pack('<L', 0x9E5D5157)
+MAGIC_NUMBER_END = struct.pack('<L', 0x0AB16F30)
 
 # struct UF2_Block {
 #     // 32 byte header
@@ -24,7 +25,7 @@ MAGIC_NUMBER_END = 0x0AB16F30
 #     uint8_t data[476];
 #     uint32_t magicEnd;
 # } UF2_Block;
-block_struct = Struct('<8L476sL')
+block_struct = Struct('<4s4s6L476s4s')
 checksum_struct = Struct('<2L4s')
 
 class Block():
@@ -33,14 +34,19 @@ class Block():
         self.__magic_start_0, self.__magic_start_1, self.__flags, self.__target_address, self.__payload_size, self.__block_number, self.__number_of_blocks, self.__file_size_or_family_id, self.__data, self.__magic_end = block_struct.unpack(bytes)
 
     @property
-    def magic_start_0(self) -> int:
+    def magic_start_0(self) -> bytes:
         """First magic number, 0x0A324655 ("UF2\\n")."""
         return self.__magic_start_0
 
     @property
-    def magic_start_1(self) -> int:
+    def magic_start_1(self) -> bytes:
         """Second magic number, 0x9E5D5157."""
         return self.__magic_start_1
+
+    @property
+    def magic_start(self) -> bytes:
+        """Magic bytes."""
+        return self.__magic_start_0 + self.__magic_start_1
 
     @property
     def flags(self) -> int:
@@ -83,7 +89,7 @@ class Block():
         return self.__data[0:self.__payload_size]
 
     @property
-    def magic_end(self) -> int:
+    def magic_end(self) -> bytes:
         """Final magic number, 0x0AB16F30."""
         return self.__magic_end
 
@@ -101,8 +107,8 @@ class Block():
         if not self.is_file_container:
             return None
 
-        string_termination = self.__data.index(b'\0', self.__payload_size)
-        return str(self.__data[self.__payload_size:string_termination])
+        string_termination = self.__data.index(b'\x00', self.__payload_size)
+        return self.__data[self.__payload_size:string_termination].decode()
 
     @property
     def is_not_main_flash(self) -> bool:
@@ -136,8 +142,8 @@ class Block():
     def validate(self) -> None:
         """Validate the block."""
         if not self.__magic_start_0 == MAGIC_NUMBER_0:
-            raise Exception("Got bad magic number 1")
+            raise Exception("Got bad magic number 1. Expected {}, got {}".format(MAGIC_NUMBER_0, self.__magic_start_0))
         if not self.__magic_start_1 == MAGIC_NUMBER_1:
-            raise Exception("Got bad magic number 2")
+            raise Exception("Got bad magic number 2. Expected {}, got {}".format(MAGIC_NUMBER_1, self.__magic_start_1))
         if not self.__magic_end == MAGIC_NUMBER_END:
-            raise Exception("Got bad end magic number")
+            raise Exception("Got bad end magic number. Expected {}, got {}".format(MAGIC_NUMBER_END, self.__magic_end))

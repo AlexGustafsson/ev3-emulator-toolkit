@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Iterator
 
 from uf2.block import Block
 
@@ -21,21 +21,9 @@ class UF2():
             data += block.data[0:block.payload_size]
         return data
 
-    # TODO: Unfinished
     def extract_files(self) -> List[str]:
         """Files in the archive."""
         files: Dict[str, bytes] = {}
-
-        # validate UF2 magic numbers
-        # make sure that targetAddr < fileSize and that fileSize isn't out of reasonable range
-        # write 0x00 at data[475] to ensure NUL termination of file name
-        # read file name from &data[payloadSize]; perform any mapping on the file name
-        # create a directory where the file is to be written if doesn't exists
-        # open the file for writing
-        # truncate the file to fileSize
-        # seek targetAddr
-        # write the payload (ie., data[0 ... payloadSize - 1])
-        # close the file
 
         for block in self.__blocks:
             if not block.is_file_container:
@@ -51,6 +39,12 @@ class UF2():
 
         return files
 
+    def extract_bytes(self) -> bytes:
+        """Extract all payload bytes in the correct order."""
+        result = bytes()
+        for block in self.__blocks:
+            result += block.data[:block.payload_size]
+        return result
 
     @staticmethod
     def read(path: str) -> "UF2":
