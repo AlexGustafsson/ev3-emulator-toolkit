@@ -66,6 +66,10 @@ class Project:
         """All files in the project's source."""
         return [("README.md", self.readme), ("pxt.json", json.dumps(self.pxt, indent=2))] + self.source_files
 
+    def file_by_name(self, filename: str) -> str:
+        """Get a file's content by name."""
+        return self.__source[filename] if filename in self.__source else None
+
     def __find_meta_blocks(self, payload: bytes) -> Iterator[int]:
         """Loop through the data to find any matching block start."""
         # The magic number of the meta data hidden within the binary data
@@ -141,6 +145,9 @@ class Project:
         # See: https://github.com/LZMA-JS/LZMA-JS/issues/44
         # See: https://github.com/LZMA-JS/LZMA-JS/issues/54
         decompressor = LZMADecompressor(lzma.FORMAT_ALONE, None, None)
+        # This is sort of shady and may cause artefacts further down the road -
+        # it does not smartly remove the end marker, but works for all tested
+        # project files (also see workaround in __extract_sources)
         return decompressor.decompress(compressed[:-6])
 
     def __extract_sources(self) -> Iterator[Tuple[object, object, object]]:
@@ -181,6 +188,9 @@ class Project:
 
             try:
                 text = self.__lzma_decompress(compressed_text)
+                # Workaround for the byte issue caused in __lzma_decompress
+                if text[-1:][0] != "}":
+                    text += b"}"
 
                 source_length = meta["headerSize"] or meta["metaSize"] or 0
                 source_meta = json.loads(text[0:source_length])
