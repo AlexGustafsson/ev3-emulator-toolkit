@@ -1,7 +1,7 @@
 import os
 from typing import List, Iterator
 
-from uf2.block import Block
+from tools.uf2.block import Block
 
 BLOCK_SIZE = 512
 

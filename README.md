@@ -43,13 +43,42 @@ docker build -t ev3-emulator-toolkit/firmware -f ./tools/firmware/Dockerfile ./t
 
 Described in more detail in `documentation/firmware-extraction.md`.
 
-### UF2 toolchain
+### UF2 and PXT project toolchain
 
 MakeCode utilizes the [UF2 format](https://github.com/microsoft/uf2) to pack its projects. The Python 3 package in `tools/uf2` can be used to interact with the archives to, for example, extract the project binary file.
 
+There are some quirks to Microsoft's implementation, such as how they handle project-related meta data as well as the project's source code. These quirks are handled in the `tools/pxt` package.
+
+To extract all files, meta files and source code from a project created via MakeCode, run the following command:
+
 ```
-python3 tools/extract.py examples/example.uf2
+python3 -m tools.extract examples/example.uf2
 ```
+
+This will create a directory `files` with the following content:
+
+```
+files/
+└── Untitled
+    ├── meta.json
+    ├── root
+    │   └── Projects
+    │       ├── Untitled.elf
+    │       └── Untitled.rbf
+    ├── source
+    │   ├── README.md
+    │   ├── main.blocks
+    │   ├── main.ts
+    │   └── pxt.json
+    ├── source-meta.json
+    └── source.json
+```
+
+The `files/Untitled/root` directory contains the files extracted from the archive in their defined tree structure. The `.elf` file is a compiled file for running the code on an EV3 device. The `.rbf` file is a small bootstrap program to execute the `.elf` file.
+
+The `files/Untitled/source` directory contains all the source files defined in the project.
+
+The `meta.json` and `source-meta.json` files are related to the PXT implementation and how the source code is saved. The `source.json` file contains the source in both the block (XML) format as well as the TypeScript code.
 
 ### EV3 emulation
 
