@@ -47,6 +47,10 @@ Described in more detail in `documentation/firmware-extraction.md`.
 
 MakeCode utilizes the [UF2 format](https://github.com/microsoft/uf2) to pack its projects. The Python 3 package in `tools/uf2` can be used to interact with the archives to, for example, extract the project binary file.
 
+```
+python3 tools/extract.py examples/example.uf2
+```
+
 ### EV3 emulation
 
 Still in progress.
