@@ -1,5 +1,5 @@
 # EV3 Emulator Toolkit
-### An effort to provide the necessary tools to build emulated EV3 experiences
+### An effort to provide the necessary tools to build emulated and simulated EV3 experiences
 ***
 
 ## Project goal
