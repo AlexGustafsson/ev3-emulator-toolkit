@@ -10,6 +10,10 @@ The goal of this project is to develop tools to interact with EV3 binaries and t
 
 The project utilizes the actively developed MakeCode of Microsoft (also known as [pxt](https://github.com/microsoft/pxt)) and more specifically, [pxt-ev3](https://github.com/microsoft/pxt-ev3) (which is available here: https://makecode.mindstorms.com). The MakeCode project features an interactive simulator, allows for block-based programming as well as a subset of JavaScript. It is open source and assembles programs for the EV3 directly in the browser.
 
+Most of the code is written in Python. This was done for several reasons. It's a language many know, can understand or at least read - especially more advanced students who may come in with this project via the use of EV3 in academia. That makes it so that readers can understand the main concepts of working with UF2, the EV3 etc. to easily port functionality to their projects written in other languages. Python is also a very simple language to run on a lot of machines (given that no third-party dependencies are used). The portability and understandability of Python code is well in line with what this project is all about.
+
+A non-goal for the project is to provide an accurate or usable virtual environment for simulation or emulation. The code and documentation is mostly meant as a knowledge base with proof of concepts for working with UF2 and EV3 simulation and emulation. The code is written in a way that no third-party libraries are used which should in theory simplify the process of porting the concepts.
+
 ## What's in the box
 
 ### Compiler toolchain
@@ -83,6 +87,32 @@ The `meta.json` and `source-meta.json` files are related to the PXT implementati
 ### EV3 emulation
 
 Still in progress.
+
+### EV3 simulation
+
+In `tools/ev3/simulation` there's code for simulating EV3 code execution. This is currently done by extracting the Blocks source code from the UF2 archive and interpreting it. The execution is based on a simulator (main "frontend"), a runtime for evaluating code and a parser for the source code.
+
+One may run the simulation using `python3 -m tools.ev3.simulation.simulator ./examples/example.uf2`. This should yield output like so:
+
+```
+...
+INFO:root:Extracting and parsing main source
+INFO:root:Registered event handler for event 'pxt-on-start'
+INFO:root:Triggered event 'pxt-on-start'
+INFO:root:Invoking block: variables_set
+DEBUG:root:Setting variable 'XBNlNv/U_9_L2$?I%KA(' to '10'
+INFO:root:Invoking block: console_log
+DEBUG:root:Logging Hello, World!
+Hello, World!
+INFO:root:Invoking block: setLights
+DEBUG:root:Setting lights to color StatusLight.Orange
+INFO:root:Invoking block: motorRun
+DEBUG:root:Run motor 'motors.largeA' with speed 50
+INFO:root:Invoking block: moodShow
+DEBUG:root:Showing mood 'moods.neutral'
+```
+
+The short-term goal of the simulation is to be able to run the most common instructions available via the PXT EV3 project (makecode.mindstorms.com). As this runtime does not know about physics, motors, sensors etc. are currently not usable. The idea is to either expose a server which one can use via APIs to communicate with the runtime, transpile the runtime to C or the like for easy embedding in other projects or simply use the code as a reference for further simulation efforts where a virtual world can be used.
 
 ## Technical solutions
 
