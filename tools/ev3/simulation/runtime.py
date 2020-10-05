@@ -98,6 +98,7 @@ class Runtime:
         lock = BranchLock(event=event, args=args, kwargs=kwargs)
         for branch in self.__branches:
             if branch.lock == lock:
+                logging.debug("Unlocked branch")
                 branch.lock = None
 
         logging.info("Triggered event '{}'".format(event))
