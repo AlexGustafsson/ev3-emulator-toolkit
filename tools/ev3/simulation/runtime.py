@@ -1,9 +1,27 @@
 import logging
+import re
 from typing import Dict, Set, List, Callable, Any
 from queue import Queue
+from dataclasses import dataclass
 
 from tools.ev3.simulation.block.block import Block
 from tools.ev3.simulation.block.source import BlockSource
+
+@dataclass
+class Branch:
+    root: Block
+    step: int
+    current_block: Block
+    # TODO: define a lock mechanism for event-handling:
+    # locks = [{event="button", key="enter"}]
+    # Then when runtime gets an event, all branches are checked for locks,
+    # if locked they are unlocked
+    # Then the event is cleared from the runtime
+
+@dataclass
+class StepResult:
+    processed_branch: Branch
+    completed_branch: bool
 
 class Runtime:
     def __init__(self, source: BlockSource) -> None:
@@ -12,7 +30,7 @@ class Runtime:
         self.__event_handlers: Dict[str, Set[Block]] = {}
 
         self.__current_branch = None
-        self.__branches: List[Block] = []
+        self.__branches: List[Branch] = []
 
         self.__handlers: Dict[str, Callable[["Runtime", Block], None]] = {}
 
@@ -31,7 +49,7 @@ class Runtime:
         return self.__current_branch
 
     @property
-    def branches(self) -> List[Block]:
+    def branches(self) -> List[Branch]:
         """Currently available branches."""
         return self.__branches
 
@@ -39,11 +57,13 @@ class Runtime:
         """Set a variable by id."""
         self.__variables[id] = value
 
-    def add_branch(self, block: Block) -> None:
+    def add_branch(self, block: Block) -> Branch:
         """Add a branch for evaluation."""
-        self.__branches.append(block)
+        branch = Branch(root=block, step=0, current_block=block)
+        self.__branches.append(branch)
         if self.__current_branch is None:
             self.__current_branch = 0
+        return branch
 
     def trigger_event(self, event: str) -> None:
         """Trigger an event by name."""
@@ -72,25 +92,39 @@ class Runtime:
             logging.info("Invoking block: {}".format(block.type))
             self.__handlers[block.type](self, block)
         else:
+            print("==/ To implement \==")
+            print("def __handle_{}(self, runtime: Runtime, block: Block) -> None:".format(re.sub(r'(?<!^)(?=[A-Z])', '_', block.type).lower()))
+            values = {
+                "type": block.type,
+                "values": block.values,
+                "fields": block.fields,
+                "statements": block.statements
+            }
+            print("\t\t# ", values)
+            print('runtime.register_handler("{}", self.__handle_{})'.format(block.type, re.sub(r'(?<!^)(?=[A-Z])', '_', block.type).lower()))
+            print("==\ To implement /==")
             raise Exception("No block handler registered for type '{}'".format(block.type))
 
 
-    def step(self) -> None:
+    def step(self) -> StepResult:
         """Execute one step."""
         if self.__current_branch is None:
             return
 
-        current_block = self.__branches[self.__current_branch]
+        processed_branch = self.__branches[self.__current_branch]
 
         # Process the call for the current branch
-        self.__invoke(current_block)
+        self.__invoke(processed_branch.current_block)
 
-        if current_block.next:
+        completed_branch = False
+        if processed_branch.current_block.next:
             # Move the branch forward
-            self.__branches[self.__current_branch] = current_block.next
+            processed_branch.step += 1
+            processed_branch.current_block = processed_branch.current_block.next
             # Move on to the next branch
             self.__current_branch = (self.__current_branch + 1) % len(self.__branches)
         else:
+            completed_branch = True
             # Remove the branch as it has been completed
             self.__branches.pop(self.__current_branch)
             # If the removed branch was the last, move on to the next branch
@@ -100,3 +134,5 @@ class Runtime:
             # If there are no more branches, reset the pointer
             if (len(self.__branches) == 0):
                 self.__current_branch = None
+
+        return StepResult(processed_branch=processed_branch, completed_branch=completed_branch)

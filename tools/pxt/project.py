@@ -146,9 +146,10 @@ class Project:
         # See: https://github.com/LZMA-JS/LZMA-JS/issues/54
         decompressor = LZMADecompressor(lzma.FORMAT_ALONE, None, None)
         # This is sort of shady and may cause artefacts further down the road -
-        # it does not smartly remove the end marker, but works for all tested
+        # it does not smartly remove the end marker, but works for some tested
         # project files (also see workaround in __extract_sources)
-        return decompressor.decompress(compressed[:-6])
+        # it may have to be changed (6-7 seems to work well)
+        return decompressor.decompress(compressed[:-7])
 
     def __extract_sources(self) -> Iterator[Tuple[object, object, object]]:
         """
