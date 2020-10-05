@@ -189,7 +189,7 @@ class Project:
             try:
                 text = self.__lzma_decompress(compressed_text)
                 # Workaround for the byte issue caused in __lzma_decompress
-                if text[-1:][0] != "}":
+                if text.decode()[-1:][0] != "}":
                     text += b"}"
 
                 source_length = meta["headerSize"] or meta["metaSize"] or 0
