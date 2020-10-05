@@ -7,7 +7,7 @@ from tools.pxt.project import Project
 from tools.ev3.simulation.block.source import BlockSource
 from tools.ev3.simulation.block.block import Block, BlockValue
 from tools.ev3.simulation.runtime import Runtime, Branch, BranchLock
-from tools.ev3.simulation.lib import get_all_handlers
+from tools.ev3.simulation.lib.utilities import get_all_handlers
 
 
 class Simulator:
