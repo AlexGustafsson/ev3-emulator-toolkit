@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import Dict, Set, List, Callable, Any
+from typing import Dict, Set, List, Callable, Any, Optional
 from queue import Queue
 from dataclasses import dataclass
 
@@ -8,15 +8,39 @@ from tools.ev3.simulation.block.block import Block
 from tools.ev3.simulation.block.source import BlockSource
 
 @dataclass
+class BranchLock:
+    event: str
+    args: List[Any]
+    kwargs: Dict[str, Any]
+
+    def __eq__(self, other: "BranchLock") -> bool:
+        if other is None:
+            return False
+
+        if self.event != other.event:
+            return False
+
+        if len(self.args) != len(other.args):
+            return False
+
+        for i in range(len(self.args)):
+            if self.args[i] != other.args[i]:
+                return False
+
+        if len(self.kwargs) != len(other.kwargs):
+            return False
+
+        for key, value in self.kwargs.items():
+            if other.kwargs[key] != value:
+                return False
+
+@dataclass
 class Branch:
     root: Block
     step: int
     current_block: Block
-    # TODO: define a lock mechanism for event-handling:
-    # locks = [{event="button", key="enter"}]
-    # Then when runtime gets an event, all branches are checked for locks,
-    # if locked they are unlocked
-    # Then the event is cleared from the runtime
+    parent_branch: Optional["Branch"]
+    lock: BranchLock
 
 @dataclass
 class StepResult:
@@ -32,7 +56,7 @@ class Runtime:
         self.__current_branch = None
         self.__branches: List[Branch] = []
 
-        self.__handlers: Dict[str, Callable[["Runtime", Block], None]] = {}
+        self.__handlers: Dict[str, Callable[["Runtime", Block, Branch], None]] = {}
 
         # Register event handlers from source
         for block in source.blocks:
@@ -57,22 +81,25 @@ class Runtime:
         """Set a variable by id."""
         self.__variables[id] = value
 
-    def add_branch(self, block: Block) -> Branch:
+    def add_branch(self, block: Block, parent_branch: Branch = None) -> Branch:
         """Add a branch for evaluation."""
-        branch = Branch(root=block, step=0, current_block=block)
+        branch = Branch(root=block, step=0, current_block=block, parent_branch=parent_branch, lock=None)
         self.__branches.append(branch)
         if self.__current_branch is None:
             self.__current_branch = 0
         return branch
 
-    def trigger_event(self, event: str) -> None:
+    def trigger_event(self, event: str, *args: Any, **kwargs: Any) -> None:
         """Trigger an event by name."""
-        if event not in self.__event_handlers:
-            logging.warning("No handlers registered for event '{}'. Events will be skipped".format(event))
-            return
+        if event in self.__event_handlers:
+            for handler in self.__event_handlers[event]:
+                self.add_branch(handler)
 
-        for handler in self.__event_handlers[event]:
-            self.add_branch(handler)
+        lock = BranchLock(event=event, args=args, kwargs=kwargs)
+        for branch in self.__branches:
+            if branch.lock == lock:
+                branch.lock = None
+
         logging.info("Triggered event '{}'".format(event))
 
     def register_event_handler(self, event: str, handler: Block) -> None:
@@ -82,15 +109,15 @@ class Runtime:
         self.__event_handlers[event].append(handler)
         logging.info("Registered event handler for event '{}'".format(event))
 
-    def register_handler(self, type: str, handler: Callable[[Block], None]) -> None:
+    def register_handler(self, type: str, handler: Callable[[Block, Branch], None]) -> None:
         """Register a handler for a type of call."""
         self.__handlers[type] = handler;
 
-    def __invoke(self, block: Block) -> None:
+    def __invoke(self, block: Block, branch: Branch) -> None:
         """Invoke a block call."""
         if block.type in self.__handlers:
             logging.info("Invoking block: {}".format(block.type))
-            self.__handlers[block.type](self, block)
+            self.__handlers[block.type](self, block, branch)
         else:
             print("==/ To implement \==")
             print("def __handle_{}(self, runtime: Runtime, block: Block) -> None:".format(re.sub(r'(?<!^)(?=[A-Z])', '_', block.type).lower()))
@@ -113,8 +140,14 @@ class Runtime:
 
         processed_branch = self.__branches[self.__current_branch]
 
+        if processed_branch.lock is not None:
+            logging.debug("Branch is locked")
+            # Move on to the next branch
+            self.__current_branch = (self.__current_branch + 1) % len(self.__branches)
+            return StepResult(processed_branch=processed_branch, completed_branch=False)
+
         # Process the call for the current branch
-        self.__invoke(processed_branch.current_block)
+        self.__invoke(processed_branch.current_block, processed_branch)
 
         completed_branch = False
         if processed_branch.current_block.next:
