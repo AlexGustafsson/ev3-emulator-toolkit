@@ -58,6 +58,8 @@ class Runtime:
 
         self.__handlers: Dict[str, Callable[["Runtime", Block, Branch], None]] = {}
 
+        self.__globals: Dict[str, Any] = {}
+
         # Register event handlers from source
         for block in source.blocks:
             for handler in block.statements.values():
@@ -76,6 +78,11 @@ class Runtime:
     def branches(self) -> List[Branch]:
         """Currently available branches."""
         return self.__branches
+
+    @property
+    def globals(self) -> Dict[str, Any]:
+        """Global values available in the runtime."""
+        return self.__globals
 
     def set_variable(self, id: str, value: Any) -> None:
         """Set a variable by id."""

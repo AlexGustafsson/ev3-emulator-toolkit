@@ -8,6 +8,7 @@ from tools.ev3.simulation.block.source import BlockSource
 from tools.ev3.simulation.block.block import Block, BlockValue
 from tools.ev3.simulation.runtime import Runtime, Branch, BranchLock
 from tools.ev3.simulation.lib.utilities import get_all_handlers
+from tools.ev3.simulation.brick import Brick, Motor
 
 
 class Simulator:
@@ -34,7 +35,16 @@ class Simulator:
         for call, handler in get_all_handlers().items():
             runtime.register_handler(call, handler)
 
+        # Create a brick and make it available to the runtime
+        brick = Brick()
+        # Hook up some motors for testing
+        brick.motors["A"] = Motor("large")
+        runtime.globals["brick"] = brick
+
+        # Trigger the start event
         runtime.trigger_event("pxt-on-start")
+
+        # Start triggering the forever event
         forever = runtime.trigger_event("forever")
 
         # For testing only, not meant for production:
@@ -46,6 +56,7 @@ class Simulator:
 
         while runtime.current_branch is not None:
             result = runtime.step()
+            # If the branch was a completed forever event, trigger it again
             if result.completed_branch and result.processed_branch == forever:
                 forever = runtime.trigger_event("forever")
-            time.sleep(0.2)
+            time.sleep(0.1)

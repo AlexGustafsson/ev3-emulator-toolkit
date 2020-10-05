@@ -16,6 +16,7 @@ def handle_console_log(runtime: Runtime, block: Block, branch: Branch) -> None:
     logging.debug("Logging {}".format(text))
     print(text)
 
+
 @call_handler("consoleLogValue")
 def handle_console_log_value(runtime: Runtime, block: Block, branch: Branch) -> None:
     name = evaluate_value(block.values["name"])

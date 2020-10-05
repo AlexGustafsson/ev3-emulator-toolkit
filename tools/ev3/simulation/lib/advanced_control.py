@@ -13,6 +13,7 @@ from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 def handle_control_run_in_parallel(runtime: Runtime, block: Block, branch: Branch) -> None:
     runtime.add_branch(block.statements["HANDLER"])
 
+
 @call_handler("controlWaitUs")
 def handle_control_wait_us(runtime: Runtime, block: Block, branch: Branch) -> None:
     #  {'type': 'control_wait_us', 'values': {'micros': BlockValue(name='micros', shadow=BlockShadow(type='math_number', fields={'NUM': BlockField(name='NUM', id=None, variable_type=None, value='4')}))}, 'fields': {}, 'statements': {}}
