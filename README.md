@@ -1,3 +1,10 @@
+<p align="center">
+  <img src=".github/screenshot.png">
+</p>
+<p align="center">
+  <i>A very early preview of an example application built around this toolkit.</i>
+</p>
+
 # EV3 Emulator Toolkit
 ### An effort to provide the necessary tools to build emulated and simulated EV3 experiences
 ***
