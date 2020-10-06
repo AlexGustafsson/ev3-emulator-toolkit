@@ -5,7 +5,7 @@ from typing import Dict, Set, List, Callable, Any, Optional
 from inspect import getmembers, ismethod
 
 from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch, BranchLock
+from tools.ev3.simulation.runtime import Runtime, Branch
 from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 
 

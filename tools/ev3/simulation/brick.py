@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Dict, Optional, List
 
+from tools.ev3.simulation.runtime import Runtime
+
 
 class Motor:
     def __init__(self, type: str) -> None:
@@ -53,7 +55,9 @@ class StatusLightPattern(Enum):
     ORANGE_PULSE = "StatusLight.OrangePulse"
 
 class Brick:
-    def __init__(self) -> None:
+    def __init__(self, runtime: Runtime) -> None:
+        self.__runtime = runtime
+
         self.__motors: Dict[str, Optional[Motor]] = {
             "A": None,
             "B": None,
@@ -92,21 +96,33 @@ class Brick:
 
     def press_backspace(self) -> None:
         """Press the backspace key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonEnter", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonEnter", event="ButtonEvent.Released")
 
     def press_up(self) -> None:
         """Press the up key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonUp", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonUp", event="ButtonEvent.Released")
 
     def press_left(self) -> None:
         """Press the left key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonLeft", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonLeft", event="ButtonEvent.Released")
 
     def press_enter(self) -> None:
         """Press the enter key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonEnter", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonEnter", event="ButtonEvent.Released")
 
     def press_right(self) -> None:
         """Press the right key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonRight", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonRight", event="ButtonEvent.Released")
 
     def press_down(self) -> None:
         """Press the down key."""
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonDown", event="ButtonEvent.Pressed")
+        self.__runtime.trigger_event("buttonEvent", button="brick.buttonDown", event="ButtonEvent.Released")
 
     def print(self, text: str, line: int=None) -> None:
         """Print a string."""

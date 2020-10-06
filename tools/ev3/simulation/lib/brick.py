@@ -5,7 +5,7 @@ from typing import Dict, Set, List, Callable, Any, Optional
 from inspect import getmembers, ismethod
 
 from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch, BranchLock
+from tools.ev3.simulation.runtime import Runtime, Branch
 from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 from tools.ev3.simulation.brick import StatusLightPattern
 
@@ -61,3 +61,13 @@ def handle_screen_clear_screen(runtime: Runtime, block: Block, branch: Branch) -
 def handle_mood_show(runtime: Runtime, block: Block, branch: Branch) -> None:
     mood = block.values["mood"].shadow.fields["mood"].value
     logging.debug("Showing mood '{}'".format(mood))
+
+
+@call_handler("buttonEvent")
+def handle_button_event(runtime: Runtime, block: Block, branch: Branch) -> None:
+    button = block.fields["button"].value
+    event = block.fields["event"].value
+    handler = block.statements["HANDLER"]
+    if handler is None:
+        return
+    runtime.register_event_handler(block.type, handler, button=button, event=event)

@@ -149,7 +149,7 @@ class Project:
         # it does not smartly remove the end marker, but works for some tested
         # project files (also see workaround in __extract_sources)
         # it may have to be changed (6-7 seems to work well)
-        return decompressor.decompress(compressed[:-7])
+        return decompressor.decompress(compressed[:-6])
 
     def __extract_sources(self) -> Iterator[Tuple[object, object, object]]:
         """
