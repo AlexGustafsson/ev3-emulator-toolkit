@@ -114,6 +114,50 @@ DEBUG:root:Showing mood 'moods.neutral'
 
 The short-term goal of the simulation is to be able to run the most common instructions available via the PXT EV3 project (makecode.mindstorms.com). As this runtime does not know about physics, motors, sensors etc. are currently not usable. The idea is to either expose a server which one can use via APIs to communicate with the runtime, transpile the runtime to C or the like for easy embedding in other projects or simply use the code as a reference for further simulation efforts where a virtual world can be used.
 
+### EV3 Simulation Server
+
+Using the `tool.simulation_server` script, one can start a PoC Socket IO server which holds the simulation (and runtime) of a specified MakeCode project file.
+
+It can be used to host the runtime and connect other tools such as a web-driven frontend or Unity.
+
+It can be run like so:
+
+```bash
+python3 -m tools.simulation_server examples/button-events.uf2
+```
+
+A simulation client is also included. It can be used to connect to the server by running the following command:
+
+```bash
+python3 -m tools.simulation_client
+```
+
+Example usage of the client:
+
+```
+> python3 -m tools.simulation_client
+
+================================================================================
+This is a super simple and bare-bones simulation client.
+
+* Enter an event to trigger, along with its parameters
+* Press enter without any input to step once
+* Enter a number and press enter to step multiple steps
+* Press CTRL+C
+
+Examples:
+buttonEnter event="ButtonEvent.Pressed" button="brick.buttonEnter"
+touchEvent event="ButtonEvent.Pressed" sensor="sensors.touch1"
+10
+<empty>
+
+================================================================================
+
+
+connected
+Choice: buttonEnter event="ButtonEvent.Pressed" button="brick.buttonEnter"
+```
+
 ## Technical solutions
 
 ## Gathered information
