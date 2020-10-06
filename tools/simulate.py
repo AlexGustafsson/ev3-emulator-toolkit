@@ -13,6 +13,7 @@ def main() -> None:
     project = Project(uf2)
     simulator = Simulator(project)
 
+    simulator.start()
     simulator.run()
 
 if __name__ == '__main__':

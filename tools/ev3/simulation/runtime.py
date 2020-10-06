@@ -84,7 +84,7 @@ class Runtime:
             self.__current_branch = 0
         return branch
 
-    def trigger_event(self, _event: str, *args: Any, **kwargs: Any) -> None:
+    def trigger_event(self, _event: str, **kwargs: Any) -> None:
         """Trigger an event by name."""
         event = Event(event=_event, parameters=kwargs)
 
@@ -99,7 +99,7 @@ class Runtime:
 
         logging.info("Triggered event '{}'".format(event))
 
-    def register_event_handler(self, _event: str, handler: Block, *args: Any, **kwargs: Any) -> None:
+    def register_event_handler(self, _event: str, handler: Block, **kwargs: Any) -> None:
         """Register a handler for an event by name."""
         event = Event(event=_event, parameters=kwargs)
         if event not in self.__event_handlers:
@@ -129,7 +129,7 @@ class Runtime:
             raise Exception("No block handler registered for type '{}'".format(block.type))
 
 
-    def step(self) -> StepResult:
+    def step(self) -> Optional[StepResult]:
         """Execute one step."""
         if self.__current_branch is None:
             return
