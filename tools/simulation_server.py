@@ -13,6 +13,7 @@ import eventlet
 from socketio import Server, WSGIApp
 
 from tools.ev3.simulation.simulator import Simulator
+from tools.ev3.simulation.brick import Motor, Sensor
 from tools.pxt.project import Project
 from tools.uf2.uf2 import UF2
 
@@ -21,21 +22,20 @@ server = Server()
 simulator: Simulator
 
 
-# @server.event(namespace="/chat")
-# def my_event(sid, data):
-#     pass
-
-
 @server.on("simulation_start")
-def event_start(client_id):
+def event_start(client_id, config):
+    for port, type in config["motors"].items():
+        simulator.brick.motors[port] = Motor(type)
+    for port, type in config["sensors"].items():
+        simulator.brick.sensors[port] = Sensor(type)
     simulator.start()
 
 
 @server.on("simulation_step")
 def event_step(client_id, count = 1):
-    # TODO: Callback here?
     for i in range(count):
         simulator.step()
+    server.emit("simulation_status_update", simulator.brick.to_dict())
 
 
 @server.on("simulation_trigger_event")
@@ -46,9 +46,6 @@ def event_trigger_event(client_id, arguments: Dict[str, Any]):
 @server.event
 def connect(session_id: str, environment):
     logging.info("Client connected session_id={}".format(session_id))
-    # raise ConnectionRefusedError("authentication failed")
-    # sio.emit("my event", {"data": "foobar"}, room=user_sid)
-    # sio.emit("my event", {"data": "foobar"})
 
 
 @server.event

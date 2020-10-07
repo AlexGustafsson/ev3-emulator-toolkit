@@ -1,5 +1,6 @@
+import json
 from enum import Enum
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any, Union
 
 from tools.ev3.simulation.runtime import Runtime
 
@@ -15,6 +16,14 @@ class Motor:
     def type(self) -> str:
         """Motor type."""
         return self.__type
+
+    def to_dict(self) -> Dict[str, Union[str, int, bool, None]]:
+        return {
+            "type": self.__type,
+            "speed": self.__speed,
+            "angle": self.__angle,
+            "count": self.__count
+        }
 
     def set_speed(self, speed: int) -> None:
         """Set speed."""
@@ -40,9 +49,13 @@ class Motor:
         # TODO: Implement
 
 class Sensor:
-    pass
+    def __init__(self, type: str) -> None:
+        pass
 
-class StatusLightPattern(Enum):
+    def to_dict(self) -> Dict[str, Union[str, int, bool, None]]:
+        return {}
+
+class StatusLightPattern(str, Enum):
     ORANGE = "StatusLight.Orange"
     OFF = "StatusLight.Off"
     GREEN = "StatusLight.Green"
@@ -93,6 +106,14 @@ class Brick:
     @property
     def status_light_pattern(self) -> StatusLightPattern:
         return self.__status_light_pattern
+
+    def to_dict(self) -> str:
+        data = {
+            "statusLightPattern": self.__status_light_pattern,
+            "motors": {port: (None if motor is None else motor.to_dict()) for port, motor in self.__motors.items()},
+            "sensors": {port: (None if sensor is None else sensor.to_dict()) for port, sensor in self.__sensors.items()},
+        }
+        return data
 
     def press_backspace(self) -> None:
         """Press the backspace key."""

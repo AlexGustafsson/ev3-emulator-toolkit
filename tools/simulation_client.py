@@ -6,12 +6,17 @@ client = Client()
 @client.event
 def connect():
     print("connected")
-    client.emit('start')
+    client.emit("simulation_start", {"motors": {"A": "large", "B": "medium"}, "sensors": {"1": "sensors.Ultrasound"}})
 
 
 @client.event
 def disconnect():
     print("disconnected")
+
+
+@client.on("simulation_status_update")
+def event_status_update(status) -> None:
+    print(status)
 
 
 print("=" * 80)
