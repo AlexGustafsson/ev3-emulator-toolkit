@@ -22,5 +22,5 @@ def handle_control_wait_us(runtime: Runtime, block: Block, branch: Branch) -> No
     #  {'type': 'control_wait_us', 'values': {'micros': BlockValue(name='micros', shadow=BlockShadow(type='math_number', fields={'NUM': BlockField(name='NUM', id=None, variable_type=None, value='4')}))}, 'fields': {}, 'statements': {}}
     us = evaluate_value(block.values["micros"])
     # TODO: Actually implement lock
-    branch.lock = BranchLock(event="interrupt", args=tuple(), kwargs={})
+    branch.lock = Event(event="interrupt", parameters={})
     log.debug("Sleeping for {}μs".format(us))
