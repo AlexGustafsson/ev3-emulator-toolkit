@@ -18,6 +18,7 @@ from tools.ev3.simulation.brick import Motor, Sensor
 from tools.pxt.project import Project
 from tools.uf2.uf2 import UF2
 
+log = logging.getLogger(__name__)
 server = Server()
 simulators: Dict[str, Simulator] = {}
 
@@ -30,7 +31,7 @@ def event_create(client_id: str, data: bytes) -> None:
         simulators[client_id] = simulator
         return True
     except Exception:
-        logging.error("Unable to create simulation", exc_info=True)
+        log.error("Unable to create simulation", exc_info=True)
         return False
 
 
@@ -57,17 +58,17 @@ def event_trigger_event(client_id: str, arguments: Dict[str, Any]):
 
 @server.event
 def connect(client_id: str, environment):
-    logging.info("Client connected client_id={}".format(client_id))
+    log.info("Client connected client_id={}".format(client_id))
 
 
 @server.event
 def disconnect(client_id: str):
-    logging.info("Client disconnected client_id={}".format(client_id))
+    log.info("Client disconnected client_id={}".format(client_id))
     del simulators[client_id]
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] [%(module)s] %(message)s')
 
     app = WSGIApp(server)
     eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 3773)), app)

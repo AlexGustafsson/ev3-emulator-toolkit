@@ -6,35 +6,36 @@ from qiling import Qiling
 from qiling.os.posix import syscall
 from qiling.os.posix.syscall.mman import ql_syscall_mmap, ql_syscall_mmap2
 
+log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s][%(module)s:%(lineno)d] %(message)s')
 
 file_descriptors = {}
 
 def hook_write(ql: Qiling, fd: int, buf, count: int) -> None:
     name = ql.os.file_des[fd].__class__.__name__
-    logging.info("Write to file: {}".format(name))
+    log.info("Write to file: {}".format(name))
     syscall.ql_syscall_write(ql, fd, buf, count)
 
 def hook_read(ql: Qiling, fd: int, buf, count: int) -> None:
     name = ql.os.file_des[fd].__class__.__name__
-    logging.info("Read file: {}".format(name))
+    log.info("Read file: {}".format(name))
     syscall.ql_syscall_read(ql, fd, buf, count)
 
 def hook_open(ql: Qiling, filename_pointer: int, flags: int, mode) -> None:
-    logging.info("Got filename pointer: {}".format(filename_pointer))
+    log.info("Got filename pointer: {}".format(filename_pointer))
     filename = ql.mem.string(filename_pointer)
-    logging.info("Open file: {}, flags: {:b}, mode: {:b}".format(filename, flags, mode))
+    log.info("Open file: {}, flags: {:b}, mode: {:b}".format(filename, flags, mode))
     syscall.ql_syscall_open(ql, filename, flags, mode)
 
 def hook_close(ql: Qiling, fd: int) -> None:
-    logging.info("Close file: {}".format(fd))
+    log.info("Close file: {}".format(fd))
     syscall.ql_syscall_close(ql, filename, flags, mode)
 
 def hook_exit(ql: Qiling, error_code: int) -> None:
-    logging.info("Exiting. Code: {}".format(error_code))
+    log.info("Exiting. Code: {}".format(error_code))
 
 def hook_invalid_memory(ql: Qiling, access, address, size, value) -> None:
-    logging.info("Got invalid memory address. Access: {}, address: {}, size: {}, value: {}".format(access, address, size, value))
+    log.info("Got invalid memory address. Access: {}, address: {}, size: {}, value: {}".format(access, address, size, value))
     # ql.mem.map(address & ~0xfff, 0x1000)
     # ql.mem.write(address & ~0xfff, b'Q' * 0x1000)
 

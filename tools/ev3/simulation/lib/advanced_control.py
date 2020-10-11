@@ -9,6 +9,9 @@ from tools.ev3.simulation.runtime import Runtime, Branch
 from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 
 
+log = logging.getLogger(__name__)
+
+
 @call_handler("controlRunInParallel")
 def handle_control_run_in_parallel(runtime: Runtime, block: Block, branch: Branch) -> None:
     runtime.add_branch(block.statements["HANDLER"])
@@ -20,4 +23,4 @@ def handle_control_wait_us(runtime: Runtime, block: Block, branch: Branch) -> No
     us = evaluate_value(block.values["micros"])
     # TODO: Actually implement lock
     branch.lock = BranchLock(event="interrupt", args=tuple(), kwargs={})
-    logging.debug("Sleeping for {}μs".format(us))
+    log.debug("Sleeping for {}μs".format(us))

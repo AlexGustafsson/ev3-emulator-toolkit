@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from tools.ev3.simulation.block.block import Block
 from tools.ev3.simulation.block.source import BlockSource
 
+
+log = logging.getLogger(__name__)
+
+
 @dataclass
 class Event:
     event: str
@@ -94,10 +98,10 @@ class Runtime:
 
         for branch in self.__branches:
             if branch.lock == event:
-                logging.debug("Unlocked branch")
+                log.debug("Unlocked branch")
                 branch.lock = None
 
-        logging.info("Triggered event '{}'".format(event))
+        log.info("Triggered event '{}'".format(event))
 
     def register_event_handler(self, _event: str, handler: Block, **kwargs: Any) -> None:
         """Register a handler for an event by name."""
@@ -105,7 +109,7 @@ class Runtime:
         if event not in self.__event_handlers:
             self.__event_handlers[event] = []
         self.__event_handlers[event].append(handler)
-        logging.info("Registered event handler for event {}".format(event))
+        log.info("Registered event handler for event {}".format(event))
 
     def register_handler(self, type: str, handler: Callable[[Block, Branch], None]) -> None:
         """Register a handler for a type of call."""
@@ -114,7 +118,7 @@ class Runtime:
     def __invoke(self, block: Block, branch: Branch) -> None:
         """Invoke a block call."""
         if block.type in self.__handlers:
-            logging.info("Invoking block: {}".format(block.type))
+            log.info("Invoking block: {}".format(block.type))
             self.__handlers[block.type](self, block, branch)
         else:
             print("\n\n# To implement this call, use the following generated stub and place it in the correct category under tools/ev3/simulation/lib")
@@ -137,7 +141,7 @@ class Runtime:
         processed_branch = self.__branches[self.__current_branch]
 
         if processed_branch.lock is not None:
-            logging.debug("Branch is locked")
+            log.debug("Branch is locked")
             # Move on to the next branch
             self.__current_branch = (self.__current_branch + 1) % len(self.__branches)
             return StepResult(processed_branch=processed_branch, completed_branch=False)

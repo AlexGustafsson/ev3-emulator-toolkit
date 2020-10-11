@@ -9,12 +9,15 @@ from tools.ev3.simulation.runtime import Runtime, Branch, Event
 from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 
 
+log = logging.getLogger(__name__)
+
+
 @call_handler("buttonWaitUntil")
 def handle_button_wait_until(runtime: Runtime, block: Block, branch: Branch) -> None:
     button = block.fields["button"].value
     event = block.fields["event"].value
     branch.lock = Event(event="buttonEvent", parameters={"button": button, "event": event}, args=tuple())
-    logging.debug("Waiting for event={} button={}".format(event, button))
+    log.debug("Waiting for event={} button={}".format(event, button))
 
 
 @call_handler("colorpauseUntilColorDetectedDetected")
@@ -22,7 +25,7 @@ def handle_colorpause_until_color_detected_detected(runtime: Runtime, block: Blo
     color = evaluate_value(block.values["color"])
     sensor = block.fields["this"].value
     branch.lock = Event(event="colorOnColorDetected", parameters={"color": color, "sensor": sensor}, args=tuple())
-    logging.debug("Waiting for sensor {} to detect color {}".format(sensor, color))
+    log.debug("Waiting for sensor {} to detect color {}".format(sensor, color))
 
 
 @call_handler("colorPauseUntilLightDetected")
@@ -31,7 +34,7 @@ def handle_color_pause_until_light_detected(runtime: Runtime, block: Block, bran
     mode = block.fields["mode"].value
     sensor = block.fields["this"].value
     branch.lock = Event(event="colorOnLightDetected", parameters={"mode": mode, "sensor": sensor}, args=tuple())
-    logging.debug("Waiting for sensor {} to detect mode {}".format(sensor, mode))
+    log.debug("Waiting for sensor {} to detect mode {}".format(sensor, mode))
 
 
 @call_handler("ultrasonicWait")
@@ -39,7 +42,7 @@ def handle_ultrasonic_wait(runtime: Runtime, block: Block, branch: Branch) -> No
     sensor = block.fields["this"].value
     event = block.fields["event"].value
     branch.lock = Event(event="ultrasonicOn", parameters={"event": event, "sensor": sensor}, args=tuple())
-    logging.debug("Waiting for sensor {} to detect event {}".format(sensor, event))
+    log.debug("Waiting for sensor {} to detect event {}".format(sensor, event))
 
 
 @call_handler("touchWaitUntil")
@@ -47,4 +50,4 @@ def handle_touch_wait_until(runtime: Runtime, block: Block, branch: Branch) -> N
     sensor = block.fields["this"].value
     event = block.fields["event"].value
     branch.lock = Event(event="touchEvent", parameters={"event": event, "sensor": sensor}, args=tuple())
-    logging.debug("Waiting for sensor {} to detect event {}".format(sensor, event))
+    log.debug("Waiting for sensor {} to detect event {}".format(sensor, event))

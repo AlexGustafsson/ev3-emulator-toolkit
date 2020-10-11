@@ -11,11 +11,14 @@ from tools.ev3.simulation.lib.utilities import get_all_handlers
 from tools.ev3.simulation.brick import Brick, Motor
 
 
+log = logging.getLogger(__name__)
+
+
 class Simulator:
     def __init__(self, project: Project) -> None:
         self.__project = project
 
-        logging.info("Extracting and parsing main source")
+        log.info("Extracting and parsing main source")
         files = dict(self.__project.files)
         main = BlockSource(files["main.blocks"])
         self.__runtime = Runtime(main)
@@ -76,5 +79,5 @@ class Simulator:
             while self.__runtime.current_branch is not None:
                 self.step()
                 time.sleep(0.1)
-            logging.debug("No branches left, waiting")
+            log.debug("No branches left, waiting")
             time.sleep(0.5)

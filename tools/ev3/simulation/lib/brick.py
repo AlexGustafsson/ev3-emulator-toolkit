@@ -10,9 +10,12 @@ from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
 from tools.ev3.simulation.brick import StatusLightPattern
 
 
+log = logging.getLogger(__name__)
+
+
 @call_handler("brickShowPorts")
 def handle_brick_show_ports(runtime: Runtime, block: Block, branch: Branch) -> None:
-    logging.debug("Show brick ports")
+    log.debug("Show brick ports")
 
 
 @call_handler("setLights")
@@ -24,7 +27,7 @@ def handle_set_lights(runtime: Runtime, block: Block, branch: Branch) -> None:
 @call_handler("screenShowImage")
 def handle_screen_show_image(runtime: Runtime, block: Block, branch: Branch) -> None:
     image = evaluate_value(block.values["image"])
-    logging.debug("Showing image {}".format(image))
+    log.debug("Showing image {}".format(image))
 
 
 @call_handler("screenPrint")
@@ -60,7 +63,7 @@ def handle_screen_clear_screen(runtime: Runtime, block: Block, branch: Branch) -
 @call_handler("moodShow")
 def handle_mood_show(runtime: Runtime, block: Block, branch: Branch) -> None:
     mood = block.values["mood"].shadow.fields["mood"].value
-    logging.debug("Showing mood '{}'".format(mood))
+    log.debug("Showing mood '{}'".format(mood))
 
 
 @call_handler("buttonEvent")

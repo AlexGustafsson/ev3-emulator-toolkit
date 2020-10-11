@@ -7,6 +7,9 @@ from lzma import LZMAError, LZMADecompressor
 
 from tools.uf2.uf2 import UF2
 
+log = logging.getLogger(__name__)
+
+
 class Project:
     def __init__(self, archive: UF2) -> None:
         self.__archive = archive
@@ -121,24 +124,24 @@ class Project:
         # Log the printf-friendly hex representation of the bytes to decompress
         hex = compressed.hex()
         hex = "\\x" + "\\x".join([hex[i:i+2] for i in range(0, len(hex), 2)])
-        logging.debug("Attempting LZMA decompression of bytes: {}".format(hex))
+        log.debug("Attempting LZMA decompression of bytes: {}".format(hex))
 
         properties, dictionary_size, uncompressed_size = struct.unpack("<BIQ", compressed[:13])
         if properties > (4 * 5 + 4) * 9 + 8:
-            logging.warning("There seems to be an issue in the LZMA header")
+            log.warning("There seems to be an issue in the LZMA header")
 
         position_bits = properties // (9 * 5)
         literal_position_bits = (properties - position_bits * 9 * 5) // 9
         literal_context_bits = (properties - position_bits * 9 * 5) - literal_position_bits * 9
 
-        logging.debug("LZMA dictionary_size={}".format(dictionary_size))
-        logging.debug("LZMA uncompressed_size={}".format(uncompressed_size))
-        logging.debug("LZMA literal_context_bits={}".format(literal_context_bits))
-        logging.debug("LZMA literal_position_bits={}".format(literal_position_bits))
-        logging.debug("LZMA position_bits={}".format(position_bits))
+        log.debug("LZMA dictionary_size={}".format(dictionary_size))
+        log.debug("LZMA uncompressed_size={}".format(uncompressed_size))
+        log.debug("LZMA literal_context_bits={}".format(literal_context_bits))
+        log.debug("LZMA literal_position_bits={}".format(literal_position_bits))
+        log.debug("LZMA position_bits={}".format(position_bits))
 
         if literal_context_bits + literal_position_bits > 4:
-            logging.warning("literal_context_bits + litereal_position_bits > 4 which may indicate LZMA header issues")
+            log.warning("literal_context_bits + litereal_position_bits > 4 which may indicate LZMA header issues")
 
         # lzma-js as used by PXT has a bug where the EOF marker is written incorrectly
         # disable it.
@@ -163,27 +166,27 @@ class Project:
         payload = self.__archive.extract_bytes()
 
         for meta_block_start in self.__find_meta_blocks(payload):
-            logging.debug("Found meta block at byte offset {}".format(meta_block_start))
+            log.debug("Found meta block at byte offset {}".format(meta_block_start))
 
             meta_length, text_length = self.__extract_header(payload, meta_block_start)
-            logging.debug("Meta length is {}".format(meta_length))
-            logging.debug("Text length is {}".format(text_length))
+            log.debug("Meta length is {}".format(meta_length))
+            log.debug("Text length is {}".format(text_length))
 
             if meta_block_start + 16 + meta_length + text_length > len(payload):
-                logging.debug("The meta size was too large, skipping")
+                log.debug("The meta size was too large, skipping")
                 continue
 
             try:
                 meta, compressed_text = self.__extract_meta(payload, meta_block_start, meta_length, text_length)
             except ValueError:
-                logging.warning("Unable to parse meta from JSON", exc_info=True)
+                log.warning("Unable to parse meta from JSON", exc_info=True)
                 yield (None, None, None)
                 continue
 
             # As per MakeCode, the only officially supported compression algorithm
             # is LZMA
             if not meta["compression"] == "LZMA":
-                logging.warning("Unsupported compression algorithm: {}".format(meta["compression"]))
+                log.warning("Unsupported compression algorithm: {}".format(meta["compression"]))
                 yield (meta, None, None)
                 continue
 
@@ -198,5 +201,5 @@ class Project:
                 source = json.loads(text[source_length:])
                 yield (meta, source_meta, source)
             except LZMAError:
-                logging.warning("Unable to decompress source", exc_info=True)
+                log.warning("Unable to decompress source", exc_info=True)
                 yield (meta, None, None)

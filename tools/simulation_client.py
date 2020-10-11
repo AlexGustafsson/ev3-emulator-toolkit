@@ -1,29 +1,34 @@
 import sys
+import logging
 from typing import Any
 from base64 import b64encode
 
 from socketio import Client
 
+log = logging.getLogger(__name__)
 client = Client()
 
 
 @client.event
 def connect():
-    print("connected")
-    client.emit("simulation_start", {"motors": {"A": "large", "B": "medium"}, "sensors": {"1": "sensors.Ultrasound"}})
-
+    log.info("Connected")
 
 @client.event
 def disconnect():
-    print("disconnected")
+    log.error("Disconnected")
     exit(1)
 
 
 def simulation_update(response: Any) -> None:
-    print(response)
+    log.info(response)
 
-def simulation_created(response: Any) -> None:
-    print(response)
+def simulation_created(succeeded: bool) -> None:
+    if not succeeded:
+        log.error("Unable to start simulation")
+        exit(1)
+
+    client.emit("simulation_start", {"motors": {"A": "large", "B": "medium"}, "sensors": {"1": "sensors.Ultrasound"}})
+
     while True:
         arguments = input("Choice: ").split(" ")
         if arguments[0] == "":
@@ -41,6 +46,8 @@ def simulation_created(response: Any) -> None:
             client.emit("simulation_trigger_event", {"event": arguments[0], "parameters": parameters})
 
 def main(project_path: str) -> None:
+    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] [%(module)s] %(message)s')
+
     print("=" * 80)
     print("This is a super simple and bare-bones simulation client.\n")
     print("* Enter an event to trigger, along with its parameters")

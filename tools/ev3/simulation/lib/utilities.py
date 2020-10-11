@@ -8,6 +8,7 @@ from glob import glob
 
 from tools.ev3.simulation.block.block import BlockValue
 
+log = logging.getLogger(__name__)
 __handlers: Dict[str, Callable[..., Any]] = {}
 
 
@@ -41,8 +42,8 @@ def evaluate_value(value: BlockValue) -> Any:
         if "SLIDER" in value.shadow.fields:
             return int(value.shadow.fields["SLIDER"].value)
         else:
-            logging.debug(value.shadow)
+            log.debug(value.shadow)
             raise Exception("Unimplemented math_number_minmax subtype '{}'".format(value.shadow.type))
 
-    logging.debug(value.shadow)
+    log.debug(value.shadow)
     raise Exception("Unimplemented value type '{}'".format(value.shadow.type))
