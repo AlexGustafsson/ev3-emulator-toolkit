@@ -47,6 +47,27 @@ class UF2():
         return result
 
     @staticmethod
+    def parse(content: bytes) -> "UF2":
+        """Read a UF2 file from bytes."""
+        if len(content) % BLOCK_SIZE > 0:
+            raise Exception("Got a bad block size, the contents may be corrupt")
+
+        blocks: List[Block] = []
+        for i in range(int(len(content) / BLOCK_SIZE)):
+            raw = content[i * BLOCK_SIZE:(i + 1) * BLOCK_SIZE]
+            block = Block(raw)
+            blocks.append(block)
+
+        # Sort by block number
+        blocks.sort(key=lambda block: block.block_number)
+
+        # Validate blocks
+        for block in blocks:
+            block.validate()
+
+        return UF2(blocks)
+
+    @staticmethod
     def read(path: str) -> "UF2":
         """Read a UF2 file from a path."""
         file_size = os.path.getsize(path)
