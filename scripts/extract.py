@@ -4,8 +4,8 @@ import json
 import logging
 from pathlib import Path
 
-from tools.uf2.uf2 import UF2
-from tools.pxt.project import Project
+from toolkit.uf2.uf2 import UF2
+from toolkit.pxt.project import Project
 
 log = logging.getLogger(__name__)
 

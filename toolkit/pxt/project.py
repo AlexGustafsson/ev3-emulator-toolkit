@@ -5,7 +5,7 @@ import logging
 from typing import Tuple, Iterator, List
 from lzma import LZMAError, LZMADecompressor
 
-from tools.uf2.uf2 import UF2
+from toolkit.uf2.uf2 import UF2
 
 log = logging.getLogger(__name__)
 

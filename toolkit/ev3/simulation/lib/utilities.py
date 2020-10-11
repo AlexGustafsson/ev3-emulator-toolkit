@@ -6,7 +6,7 @@ from typing import Dict, Set, List, Callable, Any, Optional
 from inspect import getmembers, ismethod
 from glob import glob
 
-from tools.ev3.simulation.block.block import BlockValue
+from toolkit.ev3.simulation.block.block import BlockValue
 
 log = logging.getLogger(__name__)
 __handlers: Dict[str, Callable[..., Any]] = {}

@@ -1,9 +1,9 @@
 import sys
 import logging
 
-from tools.uf2.uf2 import UF2
-from tools.pxt.project import Project
-from tools.ev3.simulation.simulator import Simulator
+from toolkit.uf2.uf2 import UF2
+from toolkit.pxt.project import Project
+from toolkit.ev3.simulation.simulator import Simulator
 
 log = logging.getLogger(__name__)
 

@@ -13,10 +13,10 @@ import eventlet
 # python3 -m pip install python-socketio
 from socketio import Server, WSGIApp
 
-from tools.ev3.simulation.simulator import Simulator
-from tools.ev3.simulation.brick import Motor, Sensor
-from tools.pxt.project import Project
-from tools.uf2.uf2 import UF2
+from toolkit.ev3.simulation.simulator import Simulator
+from toolkit.ev3.simulation.brick import Motor, Sensor
+from toolkit.pxt.project import Project
+from toolkit.uf2.uf2 import UF2
 
 log = logging.getLogger(__name__)
 server = Server()

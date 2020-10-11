@@ -4,10 +4,10 @@ from functools import wraps
 from typing import Dict, Set, List, Callable, Any, Optional
 from inspect import getmembers, ismethod
 
-from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch
-from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
-from tools.ev3.simulation.brick import StatusLightPattern
+from toolkit.ev3.simulation.block.block import Block, BlockValue
+from toolkit.ev3.simulation.runtime import Runtime, Branch
+from toolkit.ev3.simulation.lib.utilities import call_handler, evaluate_value
+from toolkit.ev3.simulation.brick import StatusLightPattern
 
 
 log = logging.getLogger(__name__)

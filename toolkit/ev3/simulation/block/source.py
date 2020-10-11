@@ -2,7 +2,7 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 from typing import Dict, Iterator, List
 
-from tools.ev3.simulation.block.block import Block, BlockField, BlockShadow, BlockValue, BlockVariableDefinition
+from toolkit.ev3.simulation.block.block import Block, BlockField, BlockShadow, BlockValue, BlockVariableDefinition
 
 class BlockSource:
     """Abstraction for a block source, such as the main.block XML file."""

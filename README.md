@@ -23,7 +23,9 @@ A non-goal for the project is to provide an accurate or usable virtual environme
 
 ## What's in the box
 
-### Compiler toolchain
+### Toolchain
+
+#### Compiler toolchain
 
 A dockerized ARM toolchain is available under `tools/toolchain`. The toolchain can be used to disassemble binaries (ELF) etc using the `toolchain.sh` script. The script takes care of mounting file parameters so that the user doesn't have to.
 
@@ -36,7 +38,7 @@ docker build -t ev3-emulator-toolkit/toolchain -f ./tools/toolchain/Dockerfile .
 ./tools/toolchain/toolchain.sh readelf --syms --wide ./examples/example.elf
 ```
 
-### Firmware compilation toolchain
+#### Firmware compilation toolchain
 
 A dockerized toolchain for building the EV3's firmware is available under `tools/firmware`. The toolchain can be used to compile the firmware available here: https://github.com/mindboards/ev3sources.
 
@@ -45,7 +47,7 @@ A dockerized toolchain for building the EV3's firmware is available under `tools
 docker build -t ev3-emulator-toolkit/firmware -f ./tools/firmware/Dockerfile ./tools/firmware/
 ```
 
-### Firmware extraction
+#### Firmware extraction
 
 1. Download a firmware from the official site: https://education.lego.com/en-us/support/mindstorms-ev3/firmware-update (there's a download button at the bottom of the site)
 2. Use `binwalk` to extract files
@@ -54,16 +56,18 @@ docker build -t ev3-emulator-toolkit/firmware -f ./tools/firmware/Dockerfile ./t
 
 Described in more detail in `documentation/firmware-extraction.md`.
 
-### UF2 and PXT project toolchain
+### Toolkit for working with the EV3, UF2 files and PXT projects
 
-MakeCode utilizes the [UF2 format](https://github.com/microsoft/uf2) to pack its projects. The Python 3 package in `tools/uf2` can be used to interact with the archives to, for example, extract the project binary file.
+#### UF2 and PXT project toolkit
 
-There are some quirks to Microsoft's implementation, such as how they handle project-related meta data as well as the project's source code. These quirks are handled in the `tools/pxt` package.
+MakeCode utilizes the [UF2 format](https://github.com/microsoft/uf2) to pack its projects. The Python 3 package in `toolkit/uf2` can be used to interact with the archives to, for example, extract the project binary file.
+
+There are some quirks to Microsoft's implementation, such as how they handle project-related meta data as well as the project's source code. These quirks are handled in the `toolkit/pxt` package.
 
 To extract all files, meta files and source code from a project created via MakeCode, run the following command:
 
 ```
-python3 -m tools.extract examples/example.uf2
+python3 -m scripts.extract examples/example.uf2
 ```
 
 This will create a directory `files` with the following content:
@@ -91,15 +95,15 @@ The `files/Untitled/source` directory contains all the source files defined in t
 
 The `meta.json` and `source-meta.json` files are related to the PXT implementation and how the source code is saved. The `source.json` file contains the source in both the block (XML) format as well as the TypeScript code.
 
-### EV3 emulation
+#### EV3 emulation
 
 Still in progress.
 
-### EV3 simulation
+#### EV3 simulation
 
-In `tools/ev3/simulation` there's code for simulating EV3 code execution. This is currently done by extracting the Blocks source code from the UF2 archive and interpreting it. The execution is based on a simulator (main "frontend"), a runtime for evaluating code and a parser for the source code.
+In `toolkit/ev3/simulation` there's code for simulating EV3 code execution. This is currently done by extracting the Blocks source code from the UF2 archive and interpreting it. The execution is based on a simulator (main "frontend"), a runtime for evaluating code and a parser for the source code.
 
-One may run the simulation using `python3 -m tools.ev3.simulation.simulator ./examples/example.uf2`. This should yield output like so:
+One may run the simulation using `python3 -m tools.simulate ./examples/example.uf2`. This should yield output like so:
 
 ```
 ...
@@ -121,28 +125,28 @@ DEBUG:root:Showing mood 'moods.neutral'
 
 The short-term goal of the simulation is to be able to run the most common instructions available via the PXT EV3 project (makecode.mindstorms.com). As this runtime does not know about physics, motors, sensors etc. are currently not usable. The idea is to either expose a server which one can use via APIs to communicate with the runtime, transpile the runtime to C or the like for easy embedding in other projects or simply use the code as a reference for further simulation efforts where a virtual world can be used.
 
-### EV3 Simulation Server
+#### EV3 Simulation Server
 
-Using the `tool.simulation_server` script, one can start a PoC Socket IO server which holds the simulation (and runtime) of a specified MakeCode project file.
+Using the `scripts.simulation_server` script, one can start a PoC Socket IO server which holds the simulation (and runtime) of a specified MakeCode project file.
 
 It can be used to host the runtime and connect other tools such as a web-driven frontend or Unity.
 
 It can be run like so:
 
 ```bash
-python3 -m tools.simulation_server examples/button-events.uf2
+python3 -m scripts.simulation_server examples/button-events.uf2
 ```
 
 A simulation client is also included. It can be used to connect to the server by running the following command:
 
 ```bash
-python3 -m tools.simulation_client
+python3 -m scripts.simulation_client
 ```
 
 Example usage of the client:
 
 ```
-> python3 -m tools.simulation_client
+> python3 -m scripts.simulation_client
 
 ================================================================================
 This is a super simple and bare-bones simulation client.

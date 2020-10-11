@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from typing import Dict, Optional, List, Any, Union
 
-from tools.ev3.simulation.runtime import Runtime
+from toolkit.ev3.simulation.runtime import Runtime
 
 
 class Motor:

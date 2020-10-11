@@ -5,9 +5,9 @@ from functools import wraps
 from typing import Dict, Set, List, Callable, Any, Optional, Tuple
 from inspect import getmembers, ismethod
 
-from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch
-from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
+from toolkit.ev3.simulation.block.block import Block, BlockValue
+from toolkit.ev3.simulation.runtime import Runtime, Branch
+from toolkit.ev3.simulation.lib.utilities import call_handler, evaluate_value
 
 
 def parse_motor_label(label: str) -> List[Tuple[str, str]]:

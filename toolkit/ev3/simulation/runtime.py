@@ -4,8 +4,8 @@ from typing import Dict, Set, List, Callable, Any, Optional, Union
 from queue import Queue
 from dataclasses import dataclass
 
-from tools.ev3.simulation.block.block import Block
-from tools.ev3.simulation.block.source import BlockSource
+from toolkit.ev3.simulation.block.block import Block
+from toolkit.ev3.simulation.block.source import BlockSource
 
 
 log = logging.getLogger(__name__)

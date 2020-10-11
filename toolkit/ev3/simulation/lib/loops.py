@@ -4,9 +4,9 @@ from functools import wraps
 from typing import Dict, Set, List, Callable, Any, Optional
 from inspect import getmembers, ismethod
 
-from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch, Event
-from tools.ev3.simulation.lib.utilities import call_handler, evaluate_value
+from toolkit.ev3.simulation.block.block import Block, BlockValue
+from toolkit.ev3.simulation.runtime import Runtime, Branch, Event
+from toolkit.ev3.simulation.lib.utilities import call_handler, evaluate_value
 
 log = logging.getLogger(__name__)
 

@@ -3,12 +3,12 @@ import logging
 import time
 from typing import Tuple, Callable, Any, Optional
 
-from tools.pxt.project import Project
-from tools.ev3.simulation.block.source import BlockSource
-from tools.ev3.simulation.block.block import Block, BlockValue
-from tools.ev3.simulation.runtime import Runtime, Branch, StepResult
-from tools.ev3.simulation.lib.utilities import get_all_handlers
-from tools.ev3.simulation.brick import Brick, Motor
+from toolkit.pxt.project import Project
+from toolkit.ev3.simulation.block.source import BlockSource
+from toolkit.ev3.simulation.block.block import Block, BlockValue
+from toolkit.ev3.simulation.runtime import Runtime, Branch, StepResult
+from toolkit.ev3.simulation.lib.utilities import get_all_handlers
+from toolkit.ev3.simulation.brick import Brick, Motor
 
 
 log = logging.getLogger(__name__)
