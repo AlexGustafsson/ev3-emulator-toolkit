@@ -1,3 +1,5 @@
+from typing import Any
+
 from socketio import Client
 
 client = Client()
@@ -14,9 +16,8 @@ def disconnect():
     print("disconnected")
 
 
-@client.on("simulation_status_update")
-def event_status_update(status) -> None:
-    print(status)
+def simulation_update(response: Any) -> None:
+    print(response)
 
 
 print("=" * 80)
@@ -41,9 +42,9 @@ while True:
         arguments = []
 
     if len(arguments) == 0:
-        client.emit("simulation_step")
+        client.emit("simulation_step", callback=simulation_update)
     elif len(arguments) == 1 and arguments[0].isdigit():
-        client.emit("simulation_step", int(arguments[0]))
+        client.emit("simulation_step", int(arguments[0]), callback=simulation_update)
     else:
         parameters = {}
         for parameter in arguments[1:]:
