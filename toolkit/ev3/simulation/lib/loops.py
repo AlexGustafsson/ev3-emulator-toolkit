@@ -31,3 +31,11 @@ def handle_device_pause(runtime: Runtime, block: Block, branch: Branch) -> None:
     # TODO: Actually implement lock
     branch.lock = Event(event="interrupt", parameters={})
     log.debug("Sleeping for {}ms".format(ms))
+
+
+@call_handler("forever")
+def handle_forever(runtime: Runtime, block: Block, branch: Branch) -> None:
+    handler = block.statements["HANDLER"]
+    if handler is None:
+        return
+    runtime.register_event_handler(block.type, handler)

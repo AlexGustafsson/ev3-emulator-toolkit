@@ -32,6 +32,8 @@ class BlockMutation():
 
 @dataclass
 class Block():
+    # ID
+    id: int
     # Location of the block
     x: Optional[int]
     # Location of the block
@@ -45,3 +47,7 @@ class Block():
     disabled: bool
     # Statements such as HANDLER for event handlers
     statements: Dict[str, "Block"]
+
+    def findTail(self) -> "Block":
+        """Find the last block of the chain, which could be this block."""
+        return self if self.next is None else self.next.findTail()

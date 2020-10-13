@@ -63,6 +63,7 @@ class BlockSource:
             elif self.__clean_tag_name(child) == "next":
                 next = self.__parse_block(child[0])
         return Block(
+            id=len(self.__blocks),
             statements=statements,
             fields=fields,
             values=values,

@@ -33,6 +33,10 @@ class Branch:
     parent_branch: Optional["Branch"]
     lock: Event
 
+    @property
+    def id(self) -> int:
+        return self.root.id
+
 @dataclass
 class StepResult:
     processed_branch: Branch
@@ -41,13 +45,20 @@ class StepResult:
 class Runtime:
     def __init__(self, source: BlockSource) -> None:
         self.__source = source
+        # Defined variables by name and value
         self.__variables: Dict[str, Any] = {}
+        # Handlers for events
         self.__event_handlers: Dict[Event, Set[Block]] = {}
 
+        # The currently active branch
         self.__current_branch = None
+        # All available branches
         self.__branches: List[Branch] = []
 
+        # Block handlers / function implementations
         self.__handlers: Dict[str, Callable[["Runtime", Block, Branch], None]] = {}
+        # Declared functions
+        self.__functions: Dict[str, Block] = {}
 
         self.__globals: Dict[str, Any] = {}
 
@@ -69,6 +80,28 @@ class Runtime:
     def globals(self) -> Dict[str, Any]:
         """Global values available in the runtime."""
         return self.__globals
+
+    @property
+    def functions(self) -> Dict[str, Block] :
+        """Defined functions."""
+        return self.__functions
+
+    def register_function(self, name: str, handler: Block) -> None:
+        """Register a function by name."""
+        self.__functions[name] = handler
+
+    def call_function(self, name: str) -> None:
+        """Call a function by name in the current branch."""
+        if not name in self.__functions:
+            raise Exception("No such function '{}'".format(name))
+
+        current_branch = self.__branches[self.__current_branch]
+        # Create a branch for the function
+        branch = self.add_branch(self.__functions[name])
+        # Lock the current branch until the function's branch is completed
+        lock = Event(event="completed_branch_{}".format(branch.id), parameters={})
+        log.debug("Locking current branch '{}' until branch '{}' completes with lock {}".format(current_branch.id, branch.id, lock))
+        current_branch.lock = lock
 
     def start(self) -> None:
         """Start the runtime. Needs to be called before evaluation, after handlers are registered."""
@@ -98,7 +131,7 @@ class Runtime:
 
         for branch in self.__branches:
             if branch.lock == event:
-                log.debug("Unlocked branch")
+                log.debug("Unlocked branch '{}'".format(branch.id))
                 branch.lock = None
 
         log.info("Triggered event '{}'".format(event))
@@ -159,6 +192,8 @@ class Runtime:
             self.__current_branch = (self.__current_branch + 1) % len(self.__branches)
         else:
             completed_branch = True
+            # Raise a branch handling event
+            self.trigger_event("completed_branch_{}".format(processed_branch.id))
             # Remove the branch as it has been completed
             self.__branches.pop(self.__current_branch)
             # If the removed branch was the last, move on to the next branch
