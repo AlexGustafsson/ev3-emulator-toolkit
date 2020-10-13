@@ -68,7 +68,7 @@ def disconnect(client_id: str):
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] [%(module)s] %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='[%(levelname)s] [%(module)s] %(message)s')
 
     app = WSGIApp(server)
     eventlet.wsgi.server(eventlet.listen(("0.0.0.0", 3773)), app)

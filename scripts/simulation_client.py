@@ -42,7 +42,7 @@ def simulation_created(succeeded: bool) -> None:
             parameters = {}
             for parameter in arguments[1:]:
                 key, value = parameter.split("=")
-                parameters[key] = value
+                parameters[key] = value[1:-1]
             client.emit("simulation_trigger_event", {"event": arguments[0], "parameters": parameters})
 
 def main(project_path: str) -> None:
